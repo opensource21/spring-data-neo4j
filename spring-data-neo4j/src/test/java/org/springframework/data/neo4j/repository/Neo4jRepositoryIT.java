@@ -16,7 +16,10 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.List;
 
+import org.hamcrest.collection.IsArrayContainingInAnyOrder;
+import org.hamcrest.core.IsSame;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,6 +67,35 @@ public class Neo4jRepositoryIT extends MultiDriverTestClass {
 		assertThat(repository.findOne(entity.getId()), is(entity));
 
 		repository.delete(Arrays.asList(entity));
+		assertThat(repository.count(), is(0L));
+	}
+
+	@Test
+	public void testCrudOperationsWithRelations() throws Exception {
+
+		SampleEntity entity1 = new SampleEntity("foo1", "bar1");
+		SampleEntity entity2 = new SampleEntity("foo2", "bar2");
+		SampleEntity entity3 = new SampleEntity("foo3", "bar3");
+		List<SampleEntity> relatedEntities = Arrays.asList(entity2, entity3);
+		entity1.setRelations(relatedEntities);
+		repository.save(entity1);
+		assertThat(entity1.getRelations().size(), is(2));
+		assertThat(repository.count(), is(3L));
+		assertThat(repository.exists(entity1.getId()), is(true));
+		assertThat(entity1.getRelations().size(), is(2)); //Fails
+		assertThat(repository.findOne(entity1.getId()), is(entity1));
+		assertThat(entity1.getRelations().size(), is(2));
+		assertThat(repository.exists(entity2.getId()), is(true));
+		assertThat(repository.findOne(entity2.getId()), is(entity2));
+		assertThat(repository.exists(entity3.getId()), is(true));
+		assertThat(repository.findOne(entity3.getId()), is(entity3));
+		SampleEntity loadedEntity1 = repository.findOne(entity1.getId());
+		assertThat(loadedEntity1.getRelations(), hasItem(entity2));
+		assertThat(loadedEntity1.getRelations(), hasItem(entity3));
+
+		repository.delete(Arrays.asList(entity1));
+		repository.delete(Arrays.asList(entity2));
+		repository.delete(Arrays.asList(entity3));
 		assertThat(repository.count(), is(0L));
 	}
 
