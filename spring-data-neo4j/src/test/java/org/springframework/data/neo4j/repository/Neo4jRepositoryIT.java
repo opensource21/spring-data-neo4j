@@ -18,8 +18,6 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.List;
 
-import org.hamcrest.collection.IsArrayContainingInAnyOrder;
-import org.hamcrest.core.IsSame;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Mark Angrish
+ * @author niels
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = Neo4jRepositoryIT.Config.class)
@@ -70,6 +69,11 @@ public class Neo4jRepositoryIT extends MultiDriverTestClass {
 		assertThat(repository.count(), is(0L));
 	}
 
+	/**
+	 * Create a test case which shows the storage of simple relations works fine.
+	 * Related to ticket DATAGRAPH-1017
+	 * @throws Exception
+	 */
 	@Test
 	public void testCrudOperationsWithRelations() throws Exception {
 
@@ -82,7 +86,7 @@ public class Neo4jRepositoryIT extends MultiDriverTestClass {
 		assertThat(entity1.getRelations().size(), is(2));
 		assertThat(repository.count(), is(3L));
 		assertThat(repository.exists(entity1.getId()), is(true));
-		assertThat(entity1.getRelations().size(), is(2)); //Fails
+		assertThat(entity1.getRelations().size(), is(2));
 		assertThat(repository.findOne(entity1.getId()), is(entity1));
 		assertThat(entity1.getRelations().size(), is(2));
 		assertThat(repository.exists(entity2.getId()), is(true));

@@ -23,6 +23,7 @@ import org.springframework.util.Assert;
 /**
  * @author Mark Angrish
  * @author Mark Paluch
+ * @author niels
  */
 @NodeEntity
 public class SampleEntity {
